@@ -1,8 +1,9 @@
+import 'package:auth_validation/bloc/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:auth_validation/bloc/login_bloc.dart';
 
 class LoginScreen extends StatelessWidget {
-  Widget _buildEmailField() {
+  Widget _buildEmailField(Bloc bloc) {
     return StreamBuilder(
       stream: bloc.email,
       builder: (context, snapshot) {
@@ -19,7 +20,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPasswordField() {
+  Widget _buildPasswordField(Bloc bloc) {
     return StreamBuilder(
       stream: bloc.password,
       builder: (context, snapshot) {
@@ -36,20 +37,22 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmitButton() {
-    return RaisedButton(
-      child: Text('Submit'),
-      elevation: 8.0,
-      color: Colors.greenAccent,
-      onPressed: () {
-        print('email:');
-        print('password:');
-      },
-    );
+  Widget _buildSubmitButton(Bloc bloc) {
+    return StreamBuilder(
+        stream: bloc.isSubmitValid,
+        builder: (context, snapshot) {
+          return RaisedButton(
+              child: Text('Submit'),
+              elevation: 8.0,
+              color: Colors.greenAccent,
+              onPressed: snapshot.hasData ? bloc.submitAuth : null);
+        });
   }
 
   @override
   Widget build(BuildContext context) {
+    final bloc = BlocProvider.of(context);
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16.0, 64.0, 16.0, 16.0),
       child: Column(
@@ -63,15 +66,15 @@ class LoginScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          _buildEmailField(),
+          _buildEmailField(bloc),
           SizedBox(
             height: 16.0,
           ),
-          _buildPasswordField(),
+          _buildPasswordField(bloc),
           SizedBox(
             height: 16.0,
           ),
-          _buildSubmitButton(),
+          _buildSubmitButton(bloc),
         ],
       ),
     );
